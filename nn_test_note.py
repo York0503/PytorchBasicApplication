@@ -478,3 +478,39 @@ for i in range(100):
   loss.backward()
   optimizer.step()
   print(loss.item())
+
+  # 保存模型
+torch.save(model.state_dict(), './mymodel.pt')
+
+########################################################################
+# 引用已訓練的模型
+params = torch.load('./mymodel.pt')
+# 參數放入模型
+model.load_state_dict(params)
+new_test_data = test_feature[100:120]
+new_test_lable = test_label[100:120]
+predict = model(new_test_data)
+result = torch.argmax(predict, axis=1)
+print(new_test_lable)
+print(result)
+
+########################################################################
+
+# 使用GPU加速
+# 將資料與模型放到GPU裡進行加速運算
+# ///如果不是GPU環境或支援cuda會報錯///
+train_feature = torch.tensor(train_feature).to(torch.float).cuda()
+train_label = torch.tensor(train_label).cuda()
+test_feature = torch.tensor(test_feature).to(torch.float).cuda()
+test_label = torch.tensor(test_label).cuda()
+
+model = nn.Sequential(
+    nn.Linear(784, 444),
+    nn.ReLU(),
+    nn.Linear(444, 555),
+    nn.ReLU(),
+    nn.Linear(555, 512),
+    nn.ReLU(),
+    nn.Linear(512, 10),
+    nn.Softmax()
+).cuda()
